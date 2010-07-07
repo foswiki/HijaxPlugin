@@ -1,0 +1,58 @@
+%META:TOPICINFO{author="WikiAdmin" date="1255619147" format="1.1" reprev="1.3" version="1.3"}%
+%META:TOPICPARENT{name="AjaxRules"}%
+<verbatim>
+%STARTSECTION{"tree"}%%TREEVIEW{topic="%topic%" web="%web%" format="* $percntINCLUDE{$quot%SYSTEMWEB%.HierarchyModules$quot section=$quotITEM:%TYPE%$quot web=$quot$web$quot topic=$quot$topic$quot raw=$quoton$quot}$percnt$n" levelprefix="   " nodiv="1" startlevel="1"}%%ENDSECTION{"tree"}%
+
+%STARTSECTION{"ITEM:TermsOfReference"}%<div class='reveal'><a class='hierarchyLink' web='%web%' topic='%topic%' href='%SCRIPTURL{view}%/%web%/%topic%'>%FORMFIELD{"JobTitle" topic="%web%.%topic%" default="!%topic%" alttext="!%topic%"}%</a>%FORMFIELD{"ResponsiblePerson" topic="%web%.%topic%" format="<a class='meta' href='%SCRIPTURL{view}%/%web%/GroupMembers?user=$value'>$value</a>"}%<div class='subAction hidden'></div></div>%ENDSECTION{"ITEM:TermsOfReference"}%
+
+%STARTSECTION{"ADD:TermsOfReference"}%<form>
+<div class='foswikiFormSteps'>
+<div id='' class='oopsMessage hidden'></div>
+<div class='foswikiFormStep'>
+<label for="JobTitle"> *JobTitle:* </label>
+
+<input type="text" name="JobTitle" size="80" class="urlParam topicTitle" value="" />
+
+<label for="ReportsTo"> *Reports to:* </label>
+
+<input type="text" disabled="disabled" size="80" name="ReportsTo" class="subTo" value="&lt;the Group Leader doesn't report to anyone within this group&gt;" />
+
+<label for="ResponsiblePerson"> *Responsible Person:* </label>
+
+<select multiple size="5" id="userlist" class="urlParam" name="ResponsiblePerson">
+%SEARCH{"*" nonoise="on" topic="%USERGROUP%" web="%USERSWEB%" format="$percntFORMATLIST{$quot$pattern(.*[\t\s]*\* Set GROUP = (.*?)[\r\n].*)$quot split=$quot[\s,]$quot separator=$quot $quot format=$quot<option value='$dollar1'>$dollarpercntSPACEOUT{$dollar1}$dollarpercnt</option>$quot}$percnt"}%
+</select>
+
+<input type="hidden" name="templatetopic" value="TermsOfReferenceTemplate" class="urlParam" />
+<input type="hidden" name="topicparent" value="%BASETOPIC%" class="urlParam" />
+<input type="hidden" name="topic" value="%BASETOPIC%AUTOINC01" class="urlParam" />
+<input type="hidden" name="hijax" value="hierarchy" class="urlParam" />
+<input type="hidden" name="cover" value="ajax" class="urlParam" />
+<input type="hidden" name="nocontent" value="1" class="urlParam" />
+</div>
+<div class='foswikiFormStep'>
+<input type="submit" class="foswikiSubmit clicktoadd clicktoaction" value="Submit" />  <input type="submit" class="foswikiSubmit clicktoclose" value="Cancel" />
+</div>
+</div>
+</form>%ENDSECTION{"ADD:TermsOfReference"}%
+
+%STARTSECTION{"setHome:TermsOfReference"}%true%ENDSECTION{"setHome:TermsOfReference"}%
+
+%STARTSECTION{"rootMessage:TermsOfReference"}%---+++ Create the Group Leader position by entering the Job Title (and selecting the Responsible Person)%ENDSECTION{"rootMessage:TermsOfReference"}%
+
+%STARTSECTION{"confirmdelete"}%<form>
+<div class='foswikiFormSteps'>
+<div id='' class='oopsMessage hidden'></div>
+<div class='foswikiFormStep'>
+<h3>Are you sure you want to delete this position?</h3>
+Any sub-positions will be left without a parent.
+</div>
+<div class='foswikiFormStep'>
+<input type="submit" class="foswikiSubmit clicktodelete clicktoaction" value="Delete" />  <input type="submit" class="foswikiSubmit clicktoclose" value="Cancel" />
+</div>
+</div>
+</form>%ENDSECTION{"confirmdelete"}%
+
+</verbatim>
+
+%META:REVCOMMENT{comment_1=" " minor_1="1" ncomments="1" rev_1="3" t_1="1255618191"}%

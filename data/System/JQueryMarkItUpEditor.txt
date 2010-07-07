@@ -1,0 +1,90 @@
+%META:TOPICINFO{author="ProjectContributor" date="1276173208" format="1.1" reprev="1.1" version="1.1"}%
+<verbatim>
+%STARTINCLUDE%
+<link rel="stylesheet" type="text/css" href="%ATTACHURL%/style.css" />
+<link rel="stylesheet" type="text/css" href="%ATTACHURL%/wikistyle.css" />
+<style>
+.markItUp {
+        width: 670px;
+}
+.markItUpEditor {
+	padding:5px 5px 5px 5px;
+	background-image:none;
+}
+.markItUpButton1, .markItUpButton2, .markItUpButton3, .markItUpButton4, .markItUpButton5, .markItUpButton6 {
+        display: %IF{"'%headingbuttons%' = 'yes'" then="inline" else="none"}%;
+}
+</style>
+<script type="text/javascript" src="%ATTACHURL%/jquery.markitup.pack.js"></script>
+<script language="javascript">
+myWikiSettings = {
+	previewParserPath:	'%SCRIPTURL{rest}%/RenderPlugin/render', // path to your Wiki parser
+	previewTemplatePath: '%ATTACHURL%/Preview.html',
+	previewParserVar: 'text',
+        previewAutoRefresh: 0,
+        resizeHandle: true,
+	onShiftEnter:		{keepDefault:false, replaceWith:'\n\n'},
+	onTab:    		{keepDefault:false, openWith:'   * ', placeHolder:''},
+	markupSet: [
+		{name:'Heading 1', key:'1', openWith:'---+ ', placeHolder:'Your title here...' },
+		{name:'Heading 2', key:'2', openWith:'---++ ', placeHolder:'Your title here...' },
+		{name:'Heading 3', key:'3', openWith:'---+++ ', placeHolder:'Your title here...' },
+		{name:'Heading 4', key:'4', openWith:'---++++ ', placeHolder:'Your title here...' },
+		{name:'Heading 5', key:'5', openWith:'---+++++ ', placeHolder:'Your title here...' },
+		{name:'Heading 6', key:'6', openWith:'---++++++ ', placeHolder:'Your title here...' },
+		{separator:'---------------' },		
+		{name:'Bold', key:'B', openWith:"*", closeWith:"*"}, 
+		{name:'Italic', key:'I', openWith:"_", closeWith:"_"}, 
+		{name:'Stroke through', key:'S', openWith:'<del>', closeWith:'</del>'}, 
+		{separator:'---------------' },
+		{name:'Bulleted list', key:'U', openWith:'   * '}, 
+		{name:'Numeric list', key:'O', openWith:'   1 '}, 
+		{separator:'---------------' },
+		{name:'Picture', key:'P', replaceWith:'<img src="[![Source:!:http://]!]" alt="[![Alternative text]!]" />' },
+		{name:'Link', key:"L", openWith:"[[[![Link]!]][", closeWith:']]', placeHolder:'Your text to link here...' },
+		{name:'Url', openWith:"[[[![Url:!:http://]!]][", closeWith:']]', placeHolder:'Your text to link here...' },
+		{separator:'---------------' },
+		{name:'Quotes', openWith:'<blockquote>', closeWith:'</blockquote>', placeHolder:''},
+		{name:'Code', openWith:'(!(<source lang="[![Language:!:php]!]">|!|<pre>)!)', closeWith:'(!(</source>|!|</pre>)!)'}, 
+		{separator:'---------------' },
+		{name:'Colors', openWith:'%NOP%%[![Color in UPPERCASE]!]%', closeWith:'%ENDC%NOP%OLOR%', dropMenu: [
+          {name:'Yellow', openWith:'%YEL%NOP%LOW%', closeWith:'%ENDC%NOP%OLOR%', className:"col1-1" },
+          {name:'Orange', openWith:'%ORA%NOP%NGE%', closeWith:'%ENDC%NOP%OLOR%', className:"col1-2" },
+          {name:'Red', openWith:'%RE%NOP%D%', closeWith:'%ENDC%NOP%OLOR%', className:"col1-3" },
+          {name:'Blue', openWith:'%BL%NOP%UE%', closeWith:'%ENDC%NOP%OLOR%', className:"col2-1" },
+          {name:'Purple', openWith:'%PUR%NOP%PLE%', closeWith:'%ENDC%NOP%OLOR%', className:"col2-2" },
+          {name:'Green', openWith:'%GRE%NOP%EN%', closeWith:'%ENDC%NOP%OLOR%', className:"col2-3" },
+          {name:'White', openWith:'%WH%NOP%ITE%', closeWith:'%ENDC%NOP%OLOR%', className:"col3-1" },
+          {name:'Gray', openWith:'%GR%NOP%AY%', closeWith:'%ENDC%NOP%OLOR%', className:"col3-2" },
+          {name:'Black', openWith:'%BLA%NOP%CK%', closeWith:'%ENDC%NOP%OLOR%', className:"col3-3" }
+		]},
+		{name:'Smilies', replaceWith:'', dropMenu: [
+          {name:'smile', replaceWith:' <nop>:) ', className:"col1-1" },
+          {name:'cool', replaceWith:' <nop>8-) ', className:"col1-2" },
+          {name:'indifferent', replaceWith:' <nop>:-I ', className:"col1-3" },
+          {name:'frown', replaceWith:' <nop>:( ', className:"col2-1" },
+          {name:'embarrassment', replaceWith:' <nop>:o ', className:"col2-2" },
+          {name:'big grin', replaceWith:' <nop>:D ', className:"col2-3" },
+          {name:'wink', replaceWith:' <nop>;) ', className:"col3-1" },
+          {name:'stick out tongue', replaceWith:' <nop>:p ', className:"col3-2" },
+          {name:'roll eyes (sarcastic)', replaceWith:' <nop>:rolleyes: ', className:"col3-3" },
+		  {name:'mad!', replaceWith:' <nop>:mad: ', className:"col4-1" },
+		  {name:'eek!', replaceWith:' <nop>:eek: ', className:"col4-2" },
+		  {name:'confused', replaceWith:' <nop>:confused: ', className:"col4-3" },
+		  {name:'hehe!', replaceWith:' <nop>:devil: ', className:"col5-1" },
+		  {name:'hehe! (friendly)', replaceWith:' <nop>:devilish: ', className:"col5-2" },
+		  {name:'sealed lips', replaceWith:' <nop>:-X ', className:"col5-3" },
+		  {name:'thumbs up', replaceWith:' <nop>:ok: ', className:"col6-1" },
+		  {name:'yes', replaceWith:' <nop>:yes: ', className:"col6-2" },
+		  {name:'no', replaceWith:' <nop>:no: ', className:"col6-3" }
+		]},
+		{separator:'---------------' },
+		{name:'Preview', call:'preview', className:'preview'}
+	]
+}
+jQuery(function()	{
+    $('%target%').markItUp(myWikiSettings);
+});
+</script>
+%STOPINCLUDE%
+</verbatim>

@@ -1,0 +1,26 @@
+%META:TOPICINFO{author="WikiAdmin" date="1255619147" format="1.1" reprev="1.3" version="1.3"}%
+%META:TOPICPARENT{name="AjaxRules"}%
+<verbatim>
+%STARTSECTION{"formatgallerylist"}%%FORMATLIST{"%LIST%" split="[\s,]" separator=" " format="$percntINCLUDE{$quot%SYSTEMWEB%.GalleryModules$quot section=$quot%GALLERYFORMAT%$quot USER=$quot$1$quot raw=$quoton$quot}$percnt"}%
+%ENDSECTION{"formatgallerylist"}%
+
+%STARTSECTION{"FORMAT:GroupMembers"}%<li>
+	<a class="thumb" href="%FORMFIELD{"Picture" topic="%USERSWEB%.%USER%" format="%PUBURL%/%USERSWEB%/%USER%/$value" default="%PUBURL%/%SYSTEMWEB%/PersonalInfoAddOn/_120___silhouette.gif" alttext="%PUBURL%/%SYSTEMWEB%/PersonalInfoAddOn/_120___silhouette.gif"}%" title="%USER%">
+		<img src="%FORMFIELD{"Picture" topic="%USERSWEB%.%USER%" format="%PUBURL%/%USERSWEB%/%USER%/$value" default="%PUBURL%/%SYSTEMWEB%/PersonalInfoAddOn/_120___silhouette.gif" alttext="%PUBURL%/%SYSTEMWEB%/PersonalInfoAddOn/_120___silhouette.gif"}%" alt="%USER%" />
+	</a>
+		<div class="username">%SPACEOUT{%USER%}%</div>
+	<div class="caption">
+		<div class="image-title">%USER% is...</div>
+		<div class="image-desc">
+%SEARCH{"ResponsiblePerson = '%USER%' AND TopicType = 'TermsOfReference'" type="query" nonoise="on" format="[[$web.$topic][$percntFORMFIELD{$quotJobTitle$quot topic=$quot$web.$topic$quot default=$quot(no title defined for this position)$quot}$percnt]]$n"}%
+		</div>
+<!--		USER% says...<br />
+		INCLUDE{"%USERSWEB%.%USER%"}% -->
+	</div>
+</li>
+%ENDSECTION{"FORMAT:GroupMembers"}%
+
+%STARTSECTION{"LIST:GroupMembers"}%%SEARCH{"*" nonoise="on" topic="%USERGROUP%" web="%USERSWEB%" format="$pattern(.*[\t\s]*\* Set GROUP = (.*?)[\r\n].*)"}%%ENDSECTION{"LIST:GroupMembers"}%
+</verbatim>
+
+%META:REVCOMMENT{comment_1=" " minor_1="1" ncomments="1" rev_1="3" t_1="1255618191"}%

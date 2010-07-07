@@ -1,0 +1,9 @@
+%META:TOPICINFO{author="WikiAdmin" date="1258378584" format="1.1" version="1.3"}%
+%META:TOPICPARENT{name="WebHome"}%
+%TMPL:INCLUDE{"view"}%
+%TMPL:DEF{"content"}%
+%INCLUDE{"%SYSTEMWEB%.GalleryViewer" GALLERYTITLE="---+ %FORMFIELD{"TopicTitle" topic="%BASEWEB%.%BASETOPIC%"}%" GALLERYTYPE="%FORMFIELD{"TopicType" topic="%BASEWEB%.%BASETOPIC%"}%"}%
+%TMPL:END%
+%TMPL:DEF{"form"}%%TMPL:END%
+
+%META:REVCOMMENT{comment_1=" " minor_1="1" ncomments="1" rev_1="27" t_1="1255614726"}%

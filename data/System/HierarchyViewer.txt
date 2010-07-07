@@ -1,0 +1,371 @@
+%META:TOPICINFO{author="WikiAdmin" date="1255618027" format="1.1" reprev="1.27" version="1.27"}%
+%META:TOPICPARENT{name="WebHome"}%
+%ADDTOHEAD{"
+<link rel='stylesheet' type='text/css' media='screen,print' href='%PUBURL%/%SYSTEMWEB%/HijaxPlugin/slickmap_v1.css' />
+<!--[if lte IE 7]>
+<link rel='stylesheet' type='text/css' media='screen,print' href='%PUBURL%/%SYSTEMWEB%/HijaxPlugin/slickmap-ie_v1.css' /> 
+<style type='text/css'>
+.empty {display:none;}
+.subAction { background-image: none; }
+</style>
+<![endif]-->
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'></script>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js'></script>
+"}%
+---+ %FORMFIELD{"TopicTitle" topic="%hierarchyweb%.%hierarchytopic%"}%
+
+%CALC{$SET(flag,0)}%
+<div id="navSitemap" class="sitemap"><div id="primaryNav" class="col4">
+<div id="createRootMessage" class="hidden">
+%INCLUDE{"%SYSTEMWEB%.HierarchyModules" section="rootMessage:%FORMFIELD{"ChildrenType" topic="%hierarchyweb%.%hierarchytopic%"}%"}%
+</div>
+%SEARCH{"parent.name = '%hierarchytopic%'" type="query" nonoise="on" web="%hierarchyweb%" format="   * $percntINCLUDE{$quot%SYSTEMWEB%.HierarchyModules$quot section=$quotITEM:%FORMFIELD{"ChildrenType" topic="%hierarchyweb%.%hierarchytopic%"}%$quot web=$quot$web$quot topic=$quot$topic$quot raw=$quoton$quot}$percnt$n$percntINCLUDE{$quot%SYSTEMWEB%.HierarchyModules$quot section=$quottree$quot web=$quot$web$quot topic=$quot$topic$quot TYPE=$quot%FORMFIELD{"ChildrenType" topic="%hierarchyweb%.%hierarchytopic%"}%$quot}$percnt$percntCALC{$SET(flag,1)}$percnt"}%
+</div>
+<div id="spinner" class='foswikiFormSteps hidden'>Please wait ...</div>
+</div>
+
+<div id='hbTemplates' class='hidden'>
+<div id='newSubTopic' class='rounded'>
+%INCLUDE{"%SYSTEMWEB%.HierarchyModules" section="ADD:%FORMFIELD{"ChildrenType" topic="%hierarchyweb%.%hierarchytopic%"}%"}%
+</div>
+<div id='deleteTopic' class='rounded'>
+%INCLUDE{"%SYSTEMWEB%.HierarchyModules" section="confirmdelete"}%
+</div>
+<div id='newSub' class='newSub actionButton' title='add a new sub position'></div>
+<div id='deletePos' class='deletePos actionButton' title='delete me'></div>
+<div id='reparentHandle' class='reparentHandle actionButton' title='move me'></div>
+</div>
+
+<script type="text/javascript">
+foswiki.HierarchyBuilder = function($){ 
+var blocked = 0;
+var $deletePos, $newSub, $reparentHandle, $target;
+
+// from Rick Strahl's Web Log, http://www.west-wind.com/weblog/posts/459873.aspx
+ $.fn.centerInClient = function(options) {
+    /// <summary>Centers the selected items in the browser window. Takes into account scroll position.
+    /// Ideally the selected set should only match a single element.
+    /// </summary>    
+    /// <param name="fn" type="Function">Optional function called when centering is complete. Passed DOM element as parameter</param>    
+    /// <param name="forceAbsolute" type="Boolean">if true forces the element to be removed from the document flow 
+    ///  and attached to the body element to ensure proper absolute positioning. 
+    /// Be aware that this may cause ID hierachy for CSS styles to be affected.
+    /// </param>
+    /// <returns type="jQuery" />
+    var opt = { forceAbsolute: false,
+                container: window,    // selector of element to center in
+                completeHandler: null,
+				minX: 0,
+				minY: 0
+              };
+    $.extend(opt, options);
+   
+    return this.each(function(i) {
+        var el = $(this);
+        var jWin = $(opt.container);
+        var isWin = opt.container == window;
+
+        // force to the top of document to ENSURE that 
+        // document absolute positioning is available
+        if (opt.forceAbsolute) {
+            if (isWin)
+                el.appendTo("body");
+            else
+                el.appendTo(jWin.get(0));
+        }
+
+        // have to make absolute
+        el.css("position", "absolute");
+
+        // height is off a bit so fudge it
+        var heightFudge = isWin ? 2.0 : 1.8;
+
+        var x = (isWin ? jWin.width() : jWin.outerWidth()) / 2 - el.outerWidth() / 2;
+        var y = (isWin ? jWin.height() : jWin.outerHeight()) / heightFudge - el.outerHeight() / 2;
+
+        el.css("left", x < opt.minX ? opt.minX + jWin.scrollLeft() : x + jWin.scrollLeft());
+        el.css("top", y < opt.minY ? opt.minY + jWin.scrollTop() : y + jWin.scrollTop());
+
+        // if specified make callback and pass element
+        if (opt.completeHandler)
+            opt.completeHandler(this);
+    });
+ };
+// })(jQuery);
+// (function($){ 
+function closeForm() {
+   $("#newFormClone").fadeOut("fast").remove();
+   // reset UI.draggable settings  //.not(":first")
+   $("#primaryNav li").css("position","relative");
+   blocked = 0;
+   return false;
+}
+function openForm($me, name) {
+	// temporarily undo UI.draggable settings so the Add New Item form displays properly
+	$("#primaryNav li").css("position","static");
+	blocked = 1;
+	var $form = $(name).clone(true).attr("id","newFormClone");
+	$form.find(".oopsMessage:first").attr("id","oopsMessage");
+	// IE6 doesn't present the form properly when done like this...
+	// $me.fadeOut("fast").parent().after($form);
+	// $form.centerInClient({container:'#navSitemap',forceAbsolute:false}).fadeIn("slow");
+	// so we use the $target global variable to record the li we want to action on later on and append the form to #navSitemap
+	$me.fadeOut('fast');
+	$target = $me.parents("li:first");
+	$form.centerInClient({container:'#primaryNav',forceAbsolute:true}).fadeIn("slow");
+	return $form;
+}
+function setColClass() {
+	var len = $('#primaryNav > ul:first > li').length;
+	if ($('#primaryNav li:first').attr('id') == 'home') {
+		if (len > 1) {len = len - 1;}
+		else {len = 1;}
+	}
+	$('#primaryNav').removeClass().addClass("col"+len);
+}
+function setIE6lastChild(newUL, $ul) {
+	if ( $.browser.msie && /6.0/.test(navigator.userAgent) ) {
+		if (!newUL) {$ul.find('.last-child').removeClass('last-child');}
+		$ul.find("li:last-child").addClass('last-child').supersleight({shim: '%PUBURLPATH%/%SYSTEMWEB%/QuickMenuSkin/blank.gif'});
+	}
+}
+$.fn.setHomeIfRequired = function() {
+	if (foswiki.HierarchyBuilder.setHome) {
+		this.attr('id','home');
+	}
+	return this;
+};
+$.fn.revealHandler = function() {
+ this.children('.reveal').each(function(i){
+  $(this).hoverIntent(function() {
+    if (!blocked) $(this).children('.subAction').css("display","inline").fadeIn('fast');
+  },function() {
+    if (!blocked) $(this).children('.subAction').fadeOut("slow");
+  });
+  $(this).children('.subAction').each(function(){
+   $newSub.clone(true).attr("id","").click(function(){
+    var $parent = $(this).parent();
+    var $form = openForm($parent,'#newSubTopic');
+//   var position = $(this).position();
+//   $form.css({'top':position.top,'left':position.left,'position':'absolute'});
+//   $(this).parent().find('.subAction').fadeOut("fast").end().after($form);
+//   var rightpos = $form.css("right");
+//   rightpos = rightpos.replace(/[a-zA-Z]/gi,"");
+//   if (rightpos < 0 && position.left != 0) {
+//     var leftpos = parseInt(position.left) + parseInt(rightpos);
+//     $form.css("left",leftpos + "px");
+//   }
+//   if ( $.browser.msie && /6.0/.test(navigator.userAgent) ) $form.css("position","static");
+    $form.find(".subTo").val($parent.siblings('.hierarchyLink').text());
+    $form.find("[name='topicparent']").val($parent.siblings('.hierarchyLink').attr("topic"));
+    $form.find("[name='topic']").val($parent.siblings('.hierarchyLink').attr("topic") + "AUTOINC01");
+    $form.find(".topicTitle").focus();
+   }).prependTo(this);
+   $deletePos.clone(true).attr("id","").click(function(){
+    	openForm($(this).parent(),'#deleteTopic');
+   }).prependTo(this);
+  });
+ });
+};
+$.fn.liConfig = function() {
+//   this.find(":has(.reveal)").each(function(){
+    $(this).revealHandler();
+	$(this).not('#home').draggable({
+		revert: true,
+		handle: ".reparentHandle",
+		start: function(){blocked = 1;},
+		stop: function(){blocked = 0;$(this).find('.subAction:first').fadeOut("slow");}
+	}).find('.subAction:first').each(function(){
+		$reparentHandle.clone(true).attr("id","").prependTo(this);
+	});
+	$(this).droppable({
+		greedy: true,
+		tolerance: 'pointer',
+		accept: '#primaryNav li',
+		drop: function(event, ui) { 
+			/* assert that child&parent web are the same.. */
+			/* only enable d&d if and on topics that the user has change perms to */
+			var $childTopic = ui.draggable;
+			var $parentTopic = $(this);
+			var childTopicName = ui.draggable.find("a:eq(0)").attr('topic');
+			var parentTopicName = $(this).find("a:eq(0)").attr('topic');
+			var webName = $(this).find("a:eq(0)").attr('web');
+			$.ajax({
+				type: "POST",
+				async: true,
+				url: '%SCRIPTURLPATH{save}%/'+webName+'/'+childTopicName , 
+				data: {
+					web: webName,
+					topic: childTopicName,
+					topicparent: parentTopicName,
+					action_save: 1,
+					forcenewrevision: 1,
+					cover: 'ajax',
+					nocontent: 1
+				}, 
+				dataType: "json",
+				cache: false, 
+				beforeSend: function(){blocked = 1;},
+				complete: function(){blocked = 0;},
+				success: function(json) {
+					if (json.context == 'view') {
+						var $ul;
+						var newUL = 0;
+						var topLevel = 0;
+						if ($parentTopic.attr("id") == "home") {
+							$ul = $parentTopic.parent(); 
+							topLevel = 1;
+						} else {
+							$ul = $parentTopic.find("ul:first");
+							if ($ul.length == 0) {$ul = $("<ul></ul>").appendTo($parentTopic); newUL = 1;}
+						}
+						var $childUL = $childTopic.parents('ul:first');
+						$ul.append($childTopic);
+						if ($childUL.children('li').length) {setIE6lastChild(0, $childUL);} 
+						else {$childUL.remove();}
+						setIE6lastChild(newUL, $ul);
+						if (topLevel || $childUL.parent().attr('id') == 'primaryNav') {
+							setColClass(); 
+						} 
+					} else {
+						$('#oopsMessage').prepend(json.content).fadeIn('slow');
+					}
+				}
+			});
+		}
+	});
+//   });
+};
+$.fn.sort = Array.prototype.sort;
+
+return {
+setHome : false,
+layout: function(){
+	if ( $.browser.msie && /6.0/.test(navigator.userAgent) ) {
+		$('#primaryNav li:last-child').addClass('last-child');
+	}
+	$('#primaryNav li:has(.reveal):first').setHomeIfRequired();
+	setColClass();
+},
+init : function(){
+//$(function($) {
+$newSub = $('#newSub');
+$deletePos = $('#deletePos');
+$reparentHandle = $('#reparentHandle');
+$('#spinner').bind("ajaxSend", function(){
+	$("#newFormClone").fadeOut();
+	$(this).centerInClient({container:'#navSitemap',forceAbsolute:false});
+	$(this).fadeIn('fast');
+	// .spinner({height:48,width:48,speed:50,frames:12,image: '%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/images/spinner_big.png'})
+}).bind("ajaxComplete", function(){
+	$(this).fadeOut('fast'); //.spinner('stop');
+	$("#newFormClone").fadeIn();
+});
+$('#hbTemplates input.clicktoclose').click(function(){return closeForm();});
+var arr = $('#userlist option').sort(function(a,b){
+	if ($(a).val() < $(b).val()) return -1;
+	if ($(a).val() > $(b).val()) return 1;
+	return 0;
+});
+$(arr).appendTo('#userlist');
+$('#newSubTopic input.clicktoadd').click(function(){
+   var $parentLI = $target; // $(this).parents("li:first");
+   $.ajax({
+	   type: "POST",
+	   async: true,
+	   url: "%SCRIPTURLPATH{save}%/%hierarchyweb%/",
+	   data: $("#newFormClone .urlParam").serialize(),
+	   dataType: "json",
+	   cache: false, 
+	   success: function(json){
+		if (json.context == 'view') {
+			var $ul;
+			var newUL = 0;
+			var topLevel = 0;
+			if ($parentLI.is("li") == false) {
+				$ul = $("#primaryNav ul:eq(0)");
+				if ($ul.length == 0) {$ul = $("<ul></ul>").prependTo("#primaryNav");}
+				newUL = 1; 
+				topLevel = 1;
+			} else if ($parentLI.attr("id") == "home") {
+				$ul = $parentLI.parent(); 
+				topLevel = 1;
+			} else {
+				$ul = $parentLI.find("ul:eq(0)");
+				if ($ul.length == 0) {$ul = $("<ul></ul>").appendTo($parentLI); newUL = 1;}
+			}
+			var html = json.hierarchy;
+			var $li = $("<li></li>").html(html).appendTo($ul);
+			setIE6lastChild(newUL, $ul);
+			if (topLevel) {
+				setColClass(); 
+				if (newUL) {$li.setHomeIfRequired(); $("#createRootMessage").hide();}
+			} 
+			$li.liConfig();
+			closeForm();
+		} else {
+			$('#oopsMessage').prepend(json.content).fadeIn('slow');
+		}
+	   }
+   });
+   return false;
+});
+$('#deleteTopic input.clicktodelete').click(function(){
+	var $deleteLI = $target; // $(this).parents("li:first");
+	var $parentLI = $deleteLI.parents("li:first");
+	var $hierarchyLink = $deleteLI.find('.hierarchyLink');
+	var topicName = $hierarchyLink.attr("topic");
+	var webName = $hierarchyLink.attr("web");
+    $.ajax({
+	   async: true,
+	   url: "%SCRIPTURLPATH{rename}%/"+webName+"/"+topicName,
+	   data: {
+			cover: "ajax",
+			nocontent: 1,
+			newweb: "Trash",
+			newtopic: topicName+Math.floor(10000*Math.random())
+		},
+	   dataType: "json",
+	   cache: false, 
+	   success: function(json){
+		if (json.context == 'view') {
+			closeForm();
+			if ($deleteLI.attr("id") == "home") {
+				$deleteLI.fadeOut("slow").remove();
+				$("#primaryNav ul:first:empty").remove(); 
+				foswiki.HierarchyBuilder.kickOff();
+			} else {
+				var $ul = $deleteLI.parents("ul:first");
+				$deleteLI.fadeOut("slow").remove();
+				setIE6lastChild(0,$ul);
+				if ($parentLI.is("li") == false) {setColClass();}
+				else if ($parentLI.find("li").length == 0) {$parentLI.children("ul").remove();}
+			}
+		} else {
+			$('#oopsMessage').prepend(json.content).fadeIn('slow');
+		}
+	   }
+	  });
+	return false;
+//});
+});
+},
+kickOff : function(){
+	$('#newSubTopic').clone(true).attr("id","newFormClone").appendTo('#createRootMessage').show();
+	$target = $("#createRootMessage").show();
+},
+runConfig : function(){
+	$('#primaryNav li:has(.reveal)').liConfig();
+}
+};
+}(jQuery);
+
+foswiki.HierarchyBuilder.setHome = %INCLUDE{"%SYSTEMWEB%.HierarchyModules" section="setHome:%FORMFIELD{"ChildrenType" topic="%hierarchyweb%.%hierarchytopic%"}%" warn="off"}%;
+foswiki.HierarchyBuilder.layout();
+%IF{"'%hierarchyweb%' allows 'change' AND '%hierarchytopic%' = '%BASETOPIC%'" then="
+foswiki.HierarchyBuilder.init();
+foswiki.HierarchyBuilder.$percntCALC{$IF($EXACT($GET(flag),0),$NOP(kickOff()),$NOP(runConfig()))}$percnt;
+"}%
+</script>
+
+%META:REVCOMMENT{comment_1=" " minor_1="1" ncomments="1" rev_1="27" t_1="1255614726"}%

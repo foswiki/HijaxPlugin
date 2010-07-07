@@ -1,0 +1,143 @@
+div.galContent {
+	/* The display of galContent is enabled by a javascript generated style on the page.
+	   This is so that the galSlideshow galContent won't display unless javascript is enabled. */
+	display: none;
+	float:right;
+	width:48%; 
+}
+div.galContent a, div.galNavigation a {
+	text-decoration: none;
+	color: #777;
+}
+div.galContent  a:focus, div.galContent  a:hover, div.galContent  a:active {
+	text-decoration: underline;
+}
+div.galControls {
+	margin-top: 5px;
+	height: 23px;
+}
+div.galControls a {
+	padding: 5px;
+}
+div.ss-controls {
+	float: left;
+}
+div.nav-controls {
+	float: right;
+}
+
+div.galLoader {
+/*	background-image: url('galLoader.gif');
+	background-repeat: no-repeat;
+	background-position: center;*/
+	width: 48%;
+	height: 350px
+}
+div.galSlideshow {
+	clear: both;
+}
+div.galSlideshow span.image-wrapper {
+	float: left;
+	padding-bottom: 12px;
+}
+div.galSlideshow a.advance-link {
+	padding: 2px;
+	display: block;
+	border: 1px solid #ccc;
+}
+div.galSlideshow img {
+	border: none;
+	display: block;
+	max-height: 350px;
+}
+.username {
+	max-width: 120px;
+	text-align: center;
+	line-height: 1.2em;
+}
+div.download {
+	float: right;
+}
+div.galEmbox {
+	clear: both;
+	border: 1px solid #ccc;
+	background-color: #eee;
+	padding: 12px;
+}
+div.image-title {
+	font-weight: bold;
+	font-size: 1.4em;
+}
+
+div.image-desc {
+	line-height: 1.3em;
+	padding-top: 12px;
+}
+div.galNavigation {
+	/* The galNavigation style is set by a javascript generated style on the page.
+	   This is so that the javascript specific styles won't be applied unless javascript is enabled. */
+}
+ul.thumbs {
+	clear: both;
+	margin: 0;
+	padding: 0;
+}
+ul.thumbs li {
+	float: left;
+	padding: 0;
+	margin: 5px 10px 5px 0;
+	list-style: none;
+	width: 120px;
+	overflow: hidden;
+	text-align: center;
+}
+a.thumb {
+	padding: 2px;
+	display: block;
+	border: 1px solid #ccc;
+}
+ul.thumbs li.selected a.thumb {
+	background: #eee;
+}
+a.thumb:focus {
+	outline: none;
+}
+ul.thumbs a.thumb {
+	display: inline-block;
+	text-align: center;
+}
+ul.thumbs img {
+	border: none;
+	display: block;
+	height: 100px;
+	width: auto;
+/*	margin-left: auto;
+	margin-right: auto;*/
+}
+div.pagination {
+	clear: both;
+}
+div.galNavigation div.top {
+	margin-bottom: 12px;
+	height: 11px;
+}
+div.galNavigation div.bottom {
+	margin-top: 12px;
+}
+div.pagination a, div.pagination span.current {
+	display: block;
+	float: left;
+	margin-right: 2px;
+	padding: 4px 7px 2px 7px;
+	border: 1px solid #ccc;
+}
+div.pagination a:hover {
+	background-color: #eee;
+	text-decoration: none;
+}
+div.pagination span.current {
+	font-weight: bold;
+	background-color: #000;
+	border-color: #000;
+	color: #fff;
+}

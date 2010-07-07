@@ -1,0 +1,101 @@
+%META:TOPICINFO{author="WikiAdmin" date="1256568256" format="1.1" reprev="1.5" version="1.5"}%
+%META:TOPICPARENT{name="WebHome"}%
+<link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/NuSkin/galleriffic.css" type="text/css" />
+%GALLERYTITLE%
+
+<div id="gallery" class="galContent">
+   <div id="galControls" class="galControls"></div>
+   <div id="galLoading" class="galLoader"></div>
+   <div id="galSlideshow" class="galSlideshow"></div>
+   <div id="galCaption" class="galEmbox"></div>
+</div>
+<div id="galThumbs" class="galNavigation">
+<ul class="thumbs noscript">
+%INCLUDE{"%SYSTEMWEB%.GalleryModules" LIST="%INCLUDE{"%SYSTEMWEB%.GalleryModules" section="LIST:%GALLERYTYPE%" raw="on"}%" GALLERYFORMAT="FORMAT:%GALLERYTYPE%" section="formatgallerylist" raw="on"}%    
+</ul>
+</div>
+<div class="twikiClear"></div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/NuSkin/jquery.galleriffic.js"></script>
+<script type="text/javascript">
+// We only want these styles applied when javascript is enabled
+$('div.galNavigation').css({'width' : '48%', 'float' : 'left'});
+$('div.galContent').css('display', 'block');
+
+// Initially set opacity on thumbs and add
+// additional styling for hover effect on thumbs
+var onMouseOutOpacity = 0.67;
+$('#galThumbs ul.thumbs li').css('opacity', onMouseOutOpacity)
+.hover(
+	function () {
+		$(this).not('.selected').fadeTo('fast', 1.0);
+	}, 
+	function () {
+		$(this).not('.selected').fadeTo('fast', onMouseOutOpacity);
+	}
+);
+
+function scaleImage() {
+      var max_height = 350; 	//Sets the max height, in pixels, for every image
+      $(".galSlideshow img").each(function(){
+          var width = $(this).width();
+          var height = $(this).height();
+//          alert(height + " " + width);
+          if (height > max_height) {
+             var ratio = ( width / height );
+             var new_height= max_height;
+             var new_width = (new_height * ratio);
+//             alert(new_height + " " + new_width);
+             $(this).height(new_height).width(new_width);
+          }
+     });
+}
+
+$(document).ready(function() {
+// Initialize Advanced Galleriffic Gallery
+var galleryAdv = $('#gallery').galleriffic('#galThumbs', {
+	delay:                  3000,
+	numThumbs:              9,
+	preloadAhead:           9,
+	enableTopPager:         true,
+	enableBottomPager:      true,
+	imageContainerSel:      '#galSlideshow',
+	controlsContainerSel:   '#galControls',
+	captionContainerSel:    '#galCaption',
+	loadingContainerSel:    '#galLoading',
+	renderSSControls:       true,
+	renderNavControls:      true,
+	playLinkText:           'Play Slideshow',
+	pauseLinkText:          'Pause Slideshow',
+	prevLinkText:           '&lsaquo; Previous Entry ',
+	nextLinkText:           'Next Entry &rsaquo;',
+	nextPageLinkText:       'Next &rsaquo;',
+	prevPageLinkText:       '&lsaquo; Prev',
+	enableHistory:          false,
+	autoStart:              false,
+	onChange:               function(prevIndex, nextIndex) {
+		$('#galThumbs ul.thumbs').children()
+			.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+			.eq(nextIndex).fadeTo('fast', 1.0);
+	},
+	onTransitionOut:        function(callback) {
+		$('#galCaption').fadeTo('fast', 0.0);
+		$('#galSlideshow').fadeTo('fast', 0.0, callback);
+	},
+	onTransitionIn:         function() {
+		$('#galSlideshow').fadeTo('fast', 1.0);
+		$('#galCaption').fadeTo('fast', 1.0);
+                if ( $.browser.msie && /6.0/.test(navigator.userAgent) ) scaleImage();
+	},
+	onPageTransitionOut:    function(callback) {
+		$('#galThumbs ul.thumbs').fadeTo('fast', 0.0, callback);
+	},
+	onPageTransitionIn:     function() {
+		$('#galThumbs ul.thumbs').fadeTo('fast', 1.0);
+	}
+});
+%IF{"defined user AND $ user != ''" then="$($quot.thumbs a.thumb[title='%URLPARAM{user}%']$quot).trigger($quotclick$quot);"}%
+});
+</script>
+
+%META:REVCOMMENT{comment_1=" " minor_1="1" ncomments="1" rev_1="5" t_1="1256558184"}%
