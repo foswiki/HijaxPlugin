@@ -25,8 +25,8 @@ require Foswiki::Attrs;
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $base );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.0';
-$SHORTDESCRIPTION = 'ajax integration';
+$RELEASE = '1.1';
+$SHORTDESCRIPTION = 'AJAX integration';
 $NO_PREFS_IN_TOPIC = 1;
 $base = 999999;
 $debug = 0; # toggle me
@@ -57,7 +57,10 @@ sub addDefaultsToPage {
 HERE
 	Foswiki::Plugins::JQueryPlugin::createPlugin("ui");
 	Foswiki::Plugins::JQueryPlugin::createPlugin("hoverIntent");
-	Foswiki::Func::addToZone('body','HIJAXPLUGIN_JS', <<HERE,'JQUERYPLUGIN::FOSWIKI,JQUERYPLUGIN::BGIFRAME,JQUERYPLUGIN::UI,JQUERYPLUGIN::HOVERINTENT');
+	my $templates = Foswiki::Func::loadTemplate( 'HijaxPlugin' );
+	my $configurableInit = Foswiki::Func::expandTemplate( 'hp_configurable_init' );
+	Foswiki::Func::addToZone('body','HIJAXPLUGIN_JS', <<"HERE",'JQUERYPLUGIN::FOSWIKI,JQUERYPLUGIN::BGIFRAME,JQUERYPLUGIN::UI,JQUERYPLUGIN::HOVERINTENT');
+$configurableInit
 <script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/HijaxPlugin/json2.js"></script>
 <script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/HijaxPlugin/hijax.js"></script>
 HERE

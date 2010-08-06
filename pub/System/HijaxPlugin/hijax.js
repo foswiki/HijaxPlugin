@@ -56,6 +56,7 @@ jQuery.fn.centerInClient = function(options) {
 // You can see the line I've commented out to allow more a fine grained selection of DOM elements,
 // e.g. $('#officetoolbar *,#MenuBar *,.patternContent *').not('.nossleight')
 //	.hpsupersleight({shim: '%PUBURL%/%SYSTEMWEB%/DocumentGraphics/empty.gif'});
+// ...and I've commented out the if statement checking for IE5.5/6, we wouldn't be here otherwise
 jQuery.fn.hpsupersleight = function(settings) {
 	settings = jQuery.extend({
 		imgs: true,
@@ -65,7 +66,7 @@ jQuery.fn.hpsupersleight = function(settings) {
 	}, settings);
 	
 	return this.each(function(){
-		if (jQuery.browser.msie && parseInt(jQuery.browser.version, 10) < 7 && parseInt(jQuery.browser.version, 10) > 4) {
+		// if (jQuery.browser.msie && parseInt(jQuery.browser.version, 10) < 7 && parseInt(jQuery.browser.version, 10) > 4) {
 			jQuery(this)
 //			.find('*').andSelf()
 			  .each(function(i,obj) {
@@ -95,7 +96,7 @@ jQuery.fn.hpsupersleight = function(settings) {
 					self.css('position', 'relative');
 				};
 			});
-		};
+		// };
 	});
 }; 
 jQuery.fn.foswikiHijax = function(){
@@ -109,7 +110,8 @@ foswiki.HijaxPlugin = function($){
 var blocked = 0;
 var validate = 0;
 var $spinner, $overlay, $rC, $rcDialog, $oopsC, $oopsDialog;
-var $hpmenu, menuH;
+var $hpmenu, $hpanchor;
+var nohijax, $hpssleight;
 var appended = [];
 var $menuTarget = null,
 	menuTimer = null,
@@ -171,7 +173,9 @@ function positionMenu(el){
 	var pos = $(el).offset();
 	if ($menuTarget) foswiki.HijaxPlugin.hideMenu();
 	$menuTarget = $(el).addClass('hasMenu');
-	$hpmenu.css({"top": pos.top - menuH,"left": pos.left + 10}).fadeIn("1000");
+	$hpanchor.css({"top": pos.top,"left": pos.left - 20});
+	$hpmenu.css({"top": pos.top - 4,"left": pos.left - 24});
+	$hpanchor.fadeIn("1000");
 	clearTimeout(menuTimer);
 }
 function appendTo(zone,content){
@@ -264,31 +268,30 @@ function ajaxError(xhr,s,params){
 			validate += 1;
 			if (validate > 1) {
 				validate = 0;
-				alert("There is an error in the Foswiki strikeone support over AJAX. \n"+
+				alert("There is an error in the HijaxPlugin strikeone support over AJAX. \n"+
 					"Please contact your wiki administrator.");
 				return;
 			}
-		case 400:
-			var loginObj;
+		default:
+			var json;
 			try {
-				loginObj = JSON.parse(xhr.responseText);
-				if (typeof loginObj === 'object' && loginObj.context) {
-					foswiki.HijaxPlugin.handleResponse(loginObj,foswiki.HijaxPlugin.serverAction,params);
+				json = JSON.parse(xhr.responseText);
+				if (typeof json === 'object' && json.context) {
+					foswiki.HijaxPlugin.handleResponse(json,foswiki.HijaxPlugin.serverAction,params);
 					// return;
 				}
 			} catch (e) {
 				// console.log(xhr.responseText);
 			}
-			if (loginObj) return;
-		default:
+			if (json) return;
 			alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status+"\nbut "+s);
-			alert("responseText: "+xhr.responseText);
+			foswiki.HijaxPlugin.showOops(xhr.responseText);
 	}
 }
 
 return {
 hideMenu : function(){
-	$hpmenu.stop(true,true).hide();
+	$($hpmenu).add($hpanchor).stop(true,true).hide();
 	if ($menuTarget) {
 		$menuTarget.removeClass('hasMenu');
 		$menuTarget = null;
@@ -297,7 +300,7 @@ hideMenu : function(){
 hijax : function(el){	
 	var $el = $(el);
 	if ($el.is('a[href]')) {
-		$el.not('.hpmenulink').hoverIntent(function(){
+		$el.not('.hpmenulink').not(nohijax).hoverIntent(function(){
 			if ($el.hasClass('hasMenu')) {
 				clearTimeout(menuTimer);
 				return;
@@ -381,7 +384,7 @@ parseURL : function(url) {
 	var script = path.replace(/^.*\/bin\//,'').replace('/'+web+'/'+topic,'');
 	var params = objectifyQuery(a.search.replace(/^\?/,''));
 	if (params.topic) {
-		// redefine the web and topic values accordingly
+		// TODO: redefine the web and topic values accordingly
 	}
     return {
         source: url,
@@ -445,6 +448,7 @@ loadContent : function(response, $target, method) {
 	return $target;
 },
 showResponse : function(response,url) {
+	this.hideMenu();
 	foswiki.HijaxPlugin.loadContent(response,$rC);
 	$rC.find('a,form').foswikiHijax();
 	if (currentURL) {
@@ -475,6 +479,7 @@ showResponse : function(response,url) {
 	return $rC;
 },
 showOops : function(response) {
+	this.hideMenu();
 	foswiki.HijaxPlugin.loadContent(response,$oopsC);
 	$oopsC.find('a,form').foswikiHijax();
 	$oopsDialog.dialog('open');
@@ -563,7 +568,7 @@ handleResponse : function(json,func,params) {
 			break;
 		default:  // response is either not an error or not provided via HijaxPlugin
 			if (params.target) {
-				foswiki.HijaxPlugin.loadContent(json,$(params.target),params.targethow);
+				foswiki.HijaxPlugin.loadContent(json,params.target,params.targetmethod);
 			}
 			if (params.success && typeof params.success === 'function') params.success(json);  // continue 
 			ret = json;
@@ -669,25 +674,13 @@ sortUserlists : function() {
 		$(this).val(selected);
 	});
 },
-init : function() {
-	var iconpath = foswiki.pubUrl+'/'+foswiki.systemWebName+'/FamFamFamSilkIcons';
-	var modaldivs = '<div id="spinner" class="foswikiFormSteps hidden"><img src="'+
+init : function(holder) {
+	nohijax = holder.nohijax, $hpssleight = holder.hps;
+	$(
+		'<div id="spinner" class="foswikiFormSteps hidden"><img src="'+
 		foswiki.pubUrl+'/'+foswiki.systemWebName+'/DocumentGraphics/processing-32-bg.gif" /></div>'+
-		// '<div id="oopsResponse" class="foswikiFormSteps rounded shadow hidden modal ontop">'+
-		// '<div id="oopsMessage" class="foswikiFormStep resetme"></div>'+
-		// '<div class="foswikiFormStep">'+
-		// '<input type="submit" class="foswikiSubmit clicktoreset" value="Close" />'+
-		// '</div>'+
-		// '</div>'+
-		// '<div id="responseModal" class="foswikiFormSteps rounded shadow hidden modal">'+
-		// '<div id="responseContent" class="foswikiFormStep resetme"></div>'+
-		// '<div class="foswikiFormStep">'+
-		// '<input type="submit" class="foswikiSubmit clicktoreset" value="Close" />'+
-		// '</div>'+
-		// '</div>'+
-		'<div id="overlay" class="hidden"></div>';
-	$(modaldivs).appendTo('body');
-	$('.modal').draggable();
+		'<div id="overlay" class="hidden"></div>'
+	).appendTo('body');
 	$overlay = $('#overlay');
 	$spinner = $('#spinner');
 	$.ajaxSetup ({
@@ -697,55 +690,40 @@ init : function() {
 		}
 	});
 	this.sortUserlists();
-	$('input.clicktoclose').click(function(){return foswiki.HijaxPlugin.closeForm();});
-	$('input.clicktoreset').click(function(){
-		$(this).parents('.modal').fadeOut('slow'); //.find('.resetme').empty();
-		return false;
-	});
 	this.pageURL = this.parseURL(window.location.href);
-	// ////////////////////
-	// the following should go into TMPL:DEFs in a topic to allow customisation
-	// the final 'hpmenu' TMPL then gets added to the bottom of the page via an addToZone
-	var hpmenu = '<div id="hpmenu" class="hidden rounded shadow" style="height:24px;"><ul>'+
-		'<li id="hppreviewli"><a class="hpmenulink" url="'+foswiki.scriptUrl+'/view/$web/$topic">'+
-		'<img alt="preview" src="'+iconpath+'/eye.png" title="Preview this page" /></a></li>'+
-		'<li><a class="hpmenulink" url="'+foswiki.scriptUrl+'/edit/$web/$topic?nowysiwyg=1">'+
-		'<img alt="edit" src="'+iconpath+'/page_edit.png" title="Edit this page" /></a></li>'+
-		'<li><a class="hpmenulink" url="'+foswiki.scriptUrl+'/attach/$web/$topic">'+
-		'<img alt="attach" src="'+iconpath+'/page_attach.png" title="Attach to this page" /></a></li>'+
-		'<li><a class="hpmenulink" url="'+foswiki.scriptUrl+'/view/$web/$topic?raw=on">'+
-		'<img alt="raw" src="'+iconpath+'/page_code.png" title="Raw view this page" /></a></li>'+
-		'<li><a class="hpmenulink" url="'+foswiki.scriptUrl+'/oops/$web/$topic?template=oopshistory">'+
-		'<img alt="history" src="'+iconpath+'/page_white_stack.png" title="Inspect the History of this page" /></a></li>'+
-		// '<li><a class="hpmenulink"'+
-		// 'url="'+foswiki.scriptUrl+'/view/$web/$topic?template=System.SiteMapView;root=$topic">'+
-		// '<img alt="children" src="'+iconpath+'/sitemap_color.png" title="Children of this page" /></a></li>'+
-		// '<li><a class="hpmenulink" url="'+foswiki.scriptUrl+
-		// '/view/$web/$topic?template=System.WebCreateNewTopic;topicparent=$topic">'+
-		// '<img alt="new" src="'+iconpath+'/page_add.png" title="Create a new child of this page" /></a></li>'+
-		'</ul></div>';
-	$hpmenu = $(hpmenu).appendTo('body');
-	$hpmenu.find('ul').hover(function(){
-		clearTimeout(menuTimer);
-	}, function(){
-		menuTimer = setTimeout("foswiki.HijaxPlugin.hideMenu()",hideTimeout);
-	});
-	$('a').not('nohijax').foswikiHijax();
-	$hpmenu.find('a').click(function(){
-		var url = this.href;
-		foswiki.HijaxPlugin.serverAction({
-			url: this.href,
-			type: 'GET',
-			success: function(json){
-				// SMELL: need to find a better way to manage the forward buffer
-				// this line is (will be) in a public place and could be accidentally removed
-				forward = [];  // reset forward history buffer
-				foswiki.HijaxPlugin.showResponse(json);
-			}
+	$hpmenu = $('#hpmenu');
+	$hpanchor = $('#hpanchor');
+	if ($hpmenu && $hpanchor) {
+		$hpmenu.find('ul').hover(function(){
+			clearTimeout(menuTimer);
+		}, function(){
+			menuTimer = setTimeout("foswiki.HijaxPlugin.hideMenu()",hideTimeout);
 		});
-		return false;
-	});
-	menuH = $hpmenu.height() + 7;
+		$hpmenu.find('a').click(function(){
+			var url = this.href;
+			foswiki.HijaxPlugin.serverAction({
+				url: this.href,
+				type: 'GET',
+				success: function(json){
+					forward = [];  // reset forward history buffer
+					foswiki.HijaxPlugin.showResponse(json);
+				}
+			});
+			return false;
+		});
+		$hpanchor.hoverIntent(function(){
+			clearTimeout(menuTimer);
+			$(this).hide();
+			$hpmenu.show();
+		}, function(){
+		});
+		$('a').foswikiHijax();
+	}
+	// IE5.5/6 png fix
+	if (/MSIE ((5\.5)|6)/.test(navigator.userAgent) && navigator.platform == "Win32" && $hpssleight) {
+		$hpssleight
+			.hpsupersleight({shim: foswiki.pubUrl+'/'+foswiki.systemWebName+'/HijaxPlugin/blank.gif'});
+	}
 	var dialogDefaults = {
 		bgiframe: true,
 		autoOpen: false,
@@ -760,16 +738,10 @@ init : function() {
 	$oopsDialog = $('<div id="oopsC"></div>').dialog(dialogDefaults);
 	$oopsDialog.dialog("option","buttons",{OK: function(){$(this).dialog('close');}});
 	$oopsC = $('#oopsC');
-	// IE5.5/6 png fix
-	if (/MSIE ((5\.5)|6)/.test(navigator.userAgent) && navigator.platform == "Win32") {
-		$('body *').not('nossleight')
-			.hpsupersleight({shim: foswiki.pubUrl+'/'+foswiki.systemWebName+'/HijaxPlugin/blank.gif'});
-	}
-	// ////////////////////
 }
 };
 }(jQuery);
 
 jQuery(function(){
-	foswiki.HijaxPlugin.init();
+	foswiki.HijaxPlugin.init(foswiki.HijaxPluginConfigurableInit());
 });
