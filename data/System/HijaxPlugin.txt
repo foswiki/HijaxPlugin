@@ -40,7 +40,7 @@ You can define additional templates to be referenced by the above parameters in 
 </verbatim>
    * =hijax= relevant templates just need to be wrapped in =%TMPL:DEF{<name>}%%TMPL:END%=
 
-=returntemplate= is the third associated parameter. If this is set and it's not an =oops= script and there's no redirect cache, the redirectCgiQueryHandler adds <code>template=<setting></code> to the url. There is a =nocontent= template provided which wipes out the =content= and =ajaxhead= templates for performance purposes, e.g. you're saving an =%ACTION{}%= to your action list topic and you only want to know that it worked, i.e. a redirect to the =view= script, you don't want the core to put effort in to parsing all those actions so you use this flag.
+=returntemplate= is the third associated parameter. If this is set and it's not an =oops= script and there's no redirect cache, the redirectCgiQueryHandler adds <code>template=<setting></code> to the url. There is a =nocontent= template provided which wipes out the =content= and =ajaxhead= templates for performance purposes, e.g. you're saving an =%%NOP%ACTION{}%= to your action list topic and you only want to know that it worked, i.e. a redirect to the =view= script, you don't want the core to put effort in to parsing all those actions so you use this flag.
    
 ---++ The =hijax.js= javascript
 
@@ -61,28 +61,28 @@ The hijax menu, the CSS selector of the links not to hijax and the jQuery select
 A suite of javascript helper functions are also provided as part of the =foswiki.HijaxPlugin= object.
    * =serverAction= : can be considered almost as a 1:1 drop in replacement for the jQuery $.ajax() function in your code. It handles login, oops and validate (strikeone) responses. The arguments it accepts as part of a javascript object are:
       * async: default true,
-	  * cache: default false,
-	  * dataType: default "json",
-	  * type: default "POST",
-	  * url: the foswiki url you want to call over ajax,
-	  * data: the params to the url, can be as a javascript object or as a jQuery .serialize() string. serverAction ensures that the =cover= parameter contains 'ajax'. If a .serialize() string is passed in, it gets objectified, checked, and rejoined into a string. To avoid the objectify step, it is recommended to use the !HijaxPlugin =asObject= function which takes a jQuery selection as its arguement.
-	  * loading: a jQuery identifier of the DOM element over which a spinner will appear during the ajax request, default is the browser window,
-	  * nooverlay: set to true to prevent an opaque overlay during the ajax request, default false,
-	  * success: the function to execute upon a successful foswiki action, i.e. not an =oops= . The JSON object is passed as the only argument.
-	  * error: the function to execute on an oops response but be careful because an =oops= is not always an error is Foswiki :-( . The JSON object is passed as the only argument.
-	  * target and targetmethod: these are related parameters and are relevant when there has been a successful foswiki action and you want to add the response to the page. See their descriptions under =loadContent= below. Note that if a =target= as well as a =success= function are specified, then both are executed.
+      * cache: default false,
+      * dataType: default "json",
+      * type: default "POST",
+      * url: the foswiki url you want to call over ajax,
+      * data: the params to the url, can be as a javascript object or as a jQuery .serialize() string. serverAction ensures that the =cover= parameter contains 'ajax'. If a .serialize() string is passed in, it gets objectified, checked, and rejoined into a string. To avoid the objectify step, it is recommended to use the !HijaxPlugin =asObject= function which takes a jQuery selection as its arguement.
+      * loading: a jQuery identifier of the DOM element over which a spinner will appear during the ajax request, default is the browser window,
+      * nooverlay: set to true to prevent an opaque overlay during the ajax request, default false,
+      * success: the function to execute upon a successful foswiki action, i.e. not an =oops= . The JSON object is passed as the only argument.
+      * error: the function to execute on an oops response but be careful because an =oops= is not always an error is Foswiki :-( . The JSON object is passed as the only argument.
+      * target and targetmethod: these are related parameters and are relevant when there has been a successful foswiki action and you want to add the response to the page. See their descriptions under =loadContent= below. Note that if a =target= as well as a =success= function are specified, then both are executed.
    * =showResponse= : this is the function used by =hijax= as the success action passed into =serverAction= . See the description above.
    * =showOops= : this is the function used by =hijax= to present an =oops= response to the user. See the description above.
    * =loadContent= : this is the low-level function used by =showResponse= and =showOops= . It takes three arguments:
       * response: if this is an object it is assumed to be the JSON object returned by the !HijaxPlugin on the server and used to retrieve the content parameter, and the head and body parameters (from ADDTOZONEs). Each element of the head and body content is checked, if it is inline css or js it gets added to the respective zone, and if it is a file, it is checked to see if it is already on the page and added if not. =response= can also be a string.
-	  * $target: this is a jQuery identifier of the DOM element that should contain the response,
-	  * method: this is the jQuery method for how the response should be added to the $target: 'replaceWith', 'append', 'prepend' or 'html'. Default is =html= .
+      * $target: this is a jQuery identifier of the DOM element that should contain the response,
+      * method: this is the jQuery method for how the response should be added to the $target: 'replaceWith', 'append', 'prepend' or 'html'. Default is =html= .
    * =sortUserlists= : alphabetically sorts select elements that have the class 'userlist'.
    * =parseURL= : this is a customisation of a function by James Padolsey. As well as exposing the usual elements of a URL in a js object it also exposes the Foswiki relevant web, topic and script.
    
 See the =hijax.js= file for further comments and functions. Lots of code examples can be found in the javascript of the !FullCalendar and Object plugins.
 
----++ The %RAND% macro
+---++ The %%NOP%RAND% macro
 
 This provides a random integer from the base 999999. With elements being incrementally added to a page via ajax, applications can use this as a way of having a simple unique identifier.
 

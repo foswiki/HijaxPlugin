@@ -308,6 +308,9 @@ hijax : function(el){
 			var myURL = foswiki.HijaxPlugin.parseURL(el.href);
 			if (myURL.hostname != foswiki.HijaxPlugin.pageURL.hostname) return;
 			switch (myURL.script) {
+				case 'edit':
+					if (!myURL.params.nowysiwyg) break;
+					// we can't support wysiwyg editing over ajax yet
 				case ''||'view':
 					if (myURL.query == '') {
 						// get the link's position and show the menu
@@ -322,13 +325,13 @@ hijax : function(el){
 					}		
 				case 'oops':
 					if (myURL.params.cover && myURL.params.cover.search('print') !== -1) break;
-				case 'attach':
+				// case 'attach':
+					// not ready to handle upload over ajax yet, need to look at the jQuery Form Plugin
 				case 'compare': 
 				case 'manage':
 				case 'rename':
 				// case 'rest':  
 					// for now, assume that it already has an associated js eventHandler from its FW plugin
-				case 'edit':
 					$hpmenu.find('li').not('#hppreviewli').hide();
 					$('#hppreviewli a').attr('href',el.href);
 					positionMenu(el);
@@ -440,9 +443,6 @@ loadContent : function(response, $target, method) {
 		default:
 			$target.html(content);
 	}
-	// return $('#responseContent').html(content)
-		// .end().parent().css("z-index","2000").centerInClient()
-		// .fadeIn('slow').end();
 	if (head) appendTo('head',head);
 	if (body) appendTo('body',body);
 	return $target;

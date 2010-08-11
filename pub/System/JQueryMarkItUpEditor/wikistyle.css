@@ -1,7 +1,9 @@
 /* -------------------------------------------------------------------
 // markItUp!
 // By Jay Salvat - http://markitup.jaysalvat.com/
-// ------------------------------------------------------------------*/
+// ------------------------------------------------------------------
+// the following css taken from the markItUp demo and customised
+// for use on the Foswiki platform */
 .markItUp .markItUpButton1 a {
 	background-image:url(images/h1.png); 
 }
@@ -175,3 +177,11 @@
 	.markItUp .markItUpButton18 .col6-3 a {
 		background-image:url(smilies/no.gif);
 	}	
+
+.markItUp {
+    width: 90%;
+}
+.markItUpEditor {
+	padding:5px 5px 5px 5px;
+	background-image:none;
+}
