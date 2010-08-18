@@ -469,12 +469,12 @@ showResponse : function(response,url) {
 		query = query ? '?' + query : '';
 		myURL.source = myURL.source.replace(myURL.query,query);
 		currentURL = myURL;
+		$rcDialog.dialog("option","title",currentURL.topic+' &lt; '+currentURL.web);
 	}
 	var buttons = $.extend(true,{},dialogButtons);
 	if (!back.length) delete buttons.Back;
 	if (!forward.length) delete buttons.Forward;
 	$rcDialog.dialog("option","buttons",buttons);
-	$rcDialog.dialog("option","title",currentURL.topic+' &lt; '+currentURL.web);
 	$rcDialog.dialog('open');
 	return $rC;
 },
