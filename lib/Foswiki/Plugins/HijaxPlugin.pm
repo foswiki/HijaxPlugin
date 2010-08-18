@@ -22,10 +22,10 @@ require Foswiki::Func;    # The plugins API
 require Foswiki::Plugins; # For the API version
 require Foswiki::Attrs;
 
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $base );
+use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $base $defaultsAdded );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.1';
+$RELEASE = '1.2';
 $SHORTDESCRIPTION = 'AJAX integration';
 $NO_PREFS_IN_TOPIC = 1;
 $base = 999999;
@@ -46,12 +46,18 @@ sub initPlugin {
 	Foswiki::Func::registerTagHandler( 'RAND', \&_handleRandom);
 
     # $debug = $Foswiki::cfg{Plugins}{HijaxPlugin}{Debug} || 0;
-	addDefaultsToPage();
+	$defaultsAdded = 0;
 
     return 1;
 }
 
+sub commonTagsHandler {
+	addDefaultsToPage();
+}
+
 sub addDefaultsToPage {
+	return if $defaultsAdded;
+	$defaultsAdded = 1;
 	Foswiki::Func::addToZone('head','HIJAXPLUGIN_CSS', <<HERE,'JQUERYPLUGIN::THEME');
 <link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/HijaxPlugin/hijax.css" type="text/css" media="all" />
 HERE
