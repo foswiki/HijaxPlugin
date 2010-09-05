@@ -65,7 +65,7 @@ HERE
 	Foswiki::Plugins::JQueryPlugin::createPlugin("hoverIntent");
 	my $templates = Foswiki::Func::loadTemplate( 'HijaxPlugin' );
 	my $configurableInit = Foswiki::Func::expandTemplate( 'hp_configurable_init' );
-	Foswiki::Func::addToZone('body','HIJAXPLUGIN_JS', <<"HERE",'JQUERYPLUGIN::FOSWIKI,JQUERYPLUGIN::BGIFRAME,JQUERYPLUGIN::UI,JQUERYPLUGIN::HOVERINTENT');
+	Foswiki::Func::addToZone('script','HIJAXPLUGIN_JS', <<"HERE",'JQUERYPLUGIN::FOSWIKI,JQUERYPLUGIN::BGIFRAME,JQUERYPLUGIN::UI,JQUERYPLUGIN::HOVERINTENT');
 $configurableInit
 <script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/HijaxPlugin/json2.js"></script>
 <script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/HijaxPlugin/hijax.js"></script>
