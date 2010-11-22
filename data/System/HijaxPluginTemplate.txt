@@ -34,7 +34,7 @@ if (foswiki.HijaxPluginConfigurableInit == undefined) {
 %TMPL:END%
 
 %{if you do want to customise the two divs defined here, don't change their id's or remove the 'hidden' class}%
-%TMPL:DEF{hpmenu}%<div id="hpmenu" class="hidden rounded shadow"><ul>%TMPL:P{hpmenu_items}%</ul></div>\
+%TMPL:DEF{hpmenu}%<div id="hpmenu" class="hpmenu hidden rounded shadow"><ul>%TMPL:P{hpmenu_items}%</ul></div>\
 <div id="hpanchor" class="hidden rounded"><img alt="M" src="%TMPL:P{hpanchor_img}%" /></div>%TMPL:END%
 
 %{use UserHijaxTemplate to customise the templates below as required}%

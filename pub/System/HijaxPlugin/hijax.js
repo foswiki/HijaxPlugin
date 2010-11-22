@@ -314,7 +314,7 @@ hijax : function(el){
 				case ''||'view':
 					if (myURL.query == '') {
 						// get the link's position and show the menu
-						$hpmenu.find('li').show().end()
+						$hpmenu.find('li').show()
 							.find('a').each(function(){
 								this.href = $(this).attr('url')
 									.replace(/\$web/g,myURL.web)
@@ -459,17 +459,37 @@ showResponse : function(response,url) {
 	if (currentURL) {
 		var myURL = this.parseURL(currentURL);
 		if (myURL.params._) delete myURL.params._; // the nocache param from $.ajax()
-		// console.log(myURL.params.cover);
+		// console.log('sR: params ')
+		// console.log(myURL.params);
+		// alert(typeof myURL.params.cover);
 		if (myURL.params.cover && myURL.params.cover.search('ajax') != -1) {
-			myURL.params.cover = myURL.params.cover.replace(/,?ajax,?/,'');
+			myURL.params.cover = myURL.params.cover.replace(/,?\bajax\b,?/,'');
 			// console.log(myURL.params.cover);
 			if (myURL.params.cover == '') delete myURL.params.cover;
+
 		}
 		var query = stringifyQuery(myURL.params);
 		query = query ? '?' + query : '';
 		myURL.source = myURL.source.replace(myURL.query,query);
 		currentURL = myURL;
+
 		$rcDialog.dialog("option","title",currentURL.topic+' &lt; '+currentURL.web);
+		// add a toolbar to the response dialog
+		if (currentURL.script == '' || currentURL.script == 'view') {
+			$hpmenu.clone(true).attr({
+					'id':''
+				}).css({
+					'right':'1em',
+					'top':'',
+					'left':''
+				}).prependTo($rC).show()
+				.find('li').show()
+				.find('a').each(function(){
+					this.href = $(this).attr('url')
+						.replace(/\$web/g,currentURL.web)
+						.replace(/\$topic/g,currentURL.topic);
+				});
+		}
 	}
 	var buttons = $.extend(true,{},dialogButtons);
 	if (!back.length) delete buttons.Back;
@@ -595,9 +615,15 @@ serverAction : function(params) {
 			
 	// This is the HijaxPlugin js framework so it's only fair to expect that we'll be
 	// guaranteeing that the HijaxPlugin is triggered on the server through /cover=~ajax/.
-	if (p.data.cover) {
-		if (p.data.cover.search('ajax') == -1) p.data.cover = 'ajax,' + p.data.cover;
-	} else if (p.data.search(/cover=[^;&]?ajax/) == -1) {
+	if (typeof p.data === 'object' && p.data.cover) {
+		if (p.data.cover.search(/\bajax\b/) == -1) {
+			if (p.url.search(/cover=[^;&]?\bajax\b/) == -1) p.data.cover = 'ajax,' + p.data.cover;
+		} else if (p.url.search(/cover=[^;&]?\bajax\b/) != -1) {
+			p.data.cover = p.data.cover.replace(/,?\bajax\b,?/,'');
+			// console.log(p.data.cover);
+			if (p.data.cover == '') delete p.data.cover;
+		}
+	} else if (typeof p.data === 'string' && p.data.search(/cover=[^;&]?\bajax\b/) == -1) {
 		// SMELL: assumes p.data is a string and that it has been created by .serialize()
 		// which would mean that it has also been URL encoded.
 		// p.data is a string (hopefully) created by .serialize()
@@ -719,13 +745,15 @@ init : function(holder) {
 		});
 		$('a').foswikiHijax();
 	}
-	// IE5.5/6 png fix
-	if (/MSIE ((5\.5)|6)/.test(navigator.userAgent) && navigator.platform == "Win32" && $hpssleight) {
-		$hpssleight
+	var needBgiframe = false;
+	// IE5.5/6 
+	if (/MSIE ((5\.5)|6)/.test(navigator.userAgent) && navigator.platform == "Win32") {
+		if ($hpssleight) $hpssleight  // png fix
 			.hpsupersleight({shim: foswiki.pubUrl+'/'+foswiki.systemWebName+'/HijaxPlugin/blank.gif'});
+		needBgiframe = true;
 	}
 	var dialogDefaults = {
-		bgiframe: true,
+		bgiframe: needBgiframe,
 		autoOpen: false,
 		show: 'blind',
 		height: 'auto',

@@ -1,4 +1,4 @@
 # Dependencies for HijaxPlugin
 JSON,>=2.21,cpan,Required.
 JSON::XS,>=2.29,cpan,Recommended for performance.
-Foswiki::Plugins::JQueryPlugin,>=3.51,perl,Required.
+Foswiki::Plugins::JQueryPlugin,>=3.73,perl,Required.

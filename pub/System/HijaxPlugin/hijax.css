@@ -31,40 +31,40 @@
 	z-index: 10021;
 	position: absolute;
 }
-#hpmenu {
+.hpmenu {
    border:2px solid #F2F2F2;
    padding:0;
    vertical-align:top;
 }
-#hpmenu, #hpanchor {
+.hpmenu, #hpanchor {
    background-color:#FFF;
    position:absolute;
    z-index:2100;
 }
-#hpmenu ul {
+.hpmenu ul {
    list-style-image:none;
    list-style-position:outside;
    list-style-type:none;
    margin:4px 0px;
    padding:0;
 }
-#hpmenu ul li {
+.hpmenu ul li {
    display:inline;
    vertical-align:middle;
    margin:2px;
 }
-#hpmenu li a:link,
-#hpmenu li a:visited {
+.hpmenu li a:link,
+.hpmenu li a:visited {
    background:transparent none repeat scroll 0 0;
    border:1px solid #CCC;
    display:inline;
    padding:2px;
    margin:0;
 }
-#hpmenu li img {
+.hpmenu li img {
    border:0 none;
 }
-#hpmenu li a:hover {
+.hpmenu li a:hover {
    border-color:#00BB00;
    border-width:2px;
    padding:1px;
