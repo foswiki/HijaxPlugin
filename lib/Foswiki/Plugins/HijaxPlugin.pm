@@ -25,7 +25,7 @@ require Foswiki::Attrs;
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $base $defaultsAdded );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.2';
+$RELEASE = '1.3';
 $SHORTDESCRIPTION = 'AJAX integration';
 $NO_PREFS_IN_TOPIC = 1;
 $base = 999999;

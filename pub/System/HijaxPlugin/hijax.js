@@ -1,3 +1,5 @@
+if (foswiki.HijaxPlugin == undefined) {
+
 // from Rick Strahl's Web Log, http://www.west-wind.com/weblog/posts/459873.aspx
 // corrected to use .offset() instead of .scrollLeft() and .scrollTop() when the container is not the window
 jQuery.fn.centerInClient = function(options) {
@@ -107,9 +109,10 @@ jQuery.fn.foswikiHijax = function(){
 jQuery.fn.sort = Array.prototype.sort;
 
 foswiki.HijaxPlugin = function($){
+this.done = false;
 var blocked = 0;
 var validate = 0;
-var $spinner, $overlay, $rC, $rcDialog, $oopsC, $oopsDialog;
+var $spinner, $overlay, $rC, $oopsC;
 var $hpmenu, $hpanchor;
 var nohijax, $hpssleight;
 var appended = [];
@@ -281,7 +284,7 @@ function ajaxError(xhr,s,params){
 					// return;
 				}
 			} catch (e) {
-				// console.log(xhr.responseText);
+				// console.log(e);
 			}
 			if (json) return;
 			alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status+"\nbut "+s);
@@ -459,12 +462,8 @@ showResponse : function(response,url) {
 	if (currentURL) {
 		var myURL = this.parseURL(currentURL);
 		if (myURL.params._) delete myURL.params._; // the nocache param from $.ajax()
-		// console.log('sR: params ')
-		// console.log(myURL.params);
-		// alert(typeof myURL.params.cover);
 		if (myURL.params.cover && myURL.params.cover.search('ajax') != -1) {
 			myURL.params.cover = myURL.params.cover.replace(/,?\bajax\b,?/,'');
-			// console.log(myURL.params.cover);
 			if (myURL.params.cover == '') delete myURL.params.cover;
 
 		}
@@ -473,7 +472,7 @@ showResponse : function(response,url) {
 		myURL.source = myURL.source.replace(myURL.query,query);
 		currentURL = myURL;
 
-		$rcDialog.dialog("option","title",currentURL.topic+' &lt; '+currentURL.web);
+		$rC.dialog("option","title",currentURL.topic+' &lt; '+currentURL.web);
 		// add a toolbar to the response dialog
 		if (currentURL.script == '' || currentURL.script == 'view') {
 			$hpmenu.clone(true).attr({
@@ -481,7 +480,8 @@ showResponse : function(response,url) {
 				}).css({
 					'right':'1em',
 					'top':'',
-					'left':''
+					'left':'',
+					'clear':'both'
 				}).prependTo($rC).show()
 				.find('li').show()
 				.find('a').each(function(){
@@ -494,15 +494,16 @@ showResponse : function(response,url) {
 	var buttons = $.extend(true,{},dialogButtons);
 	if (!back.length) delete buttons.Back;
 	if (!forward.length) delete buttons.Forward;
-	$rcDialog.dialog("option","buttons",buttons);
-	$rcDialog.dialog('open');
+	$rC.dialog("option","buttons",buttons);
+	// $rC.siblings('div.ui-dialog-buttonpane').insertBefore($rC);
+	$rC.dialog('open').dialog('moveToTop');
 	return $rC;
 },
 showOops : function(response) {
 	this.hideMenu();
 	foswiki.HijaxPlugin.loadContent(response,$oopsC);
 	$oopsC.find('a,form').foswikiHijax();
-	$oopsDialog.dialog('open');
+	$oopsC.dialog('open').dialog('moveToTop');
 	return $oopsC;
 },
 asObject : function($set) {
@@ -760,16 +761,21 @@ init : function(holder) {
 		width: '960px',
 		maxWidth: '960'
 	};
-	$rcDialog = $('<div id="rC"></div>').dialog(dialogDefaults);
-	$rcDialog.find('div.ui-dialog-buttonpane').insertAfter('#ui-dialog-title-rC');
-	$rC = $('#rC');
-	$oopsDialog = $('<div id="oopsC"></div>').dialog(dialogDefaults);
-	$oopsDialog.dialog("option","buttons",{OK: function(){$(this).dialog('close');}});
-	$oopsC = $('#oopsC');
+	$rC = $('<div id="rC"></div>').dialog(dialogDefaults);
+	$oopsC = $('<div id="oopsC"></div>')
+		.dialog(dialogDefaults)
+		.dialog("option","buttons",{OK: function(){$(this).dialog('close');}});
+	this.done = true;
+},
+initialised : function() {
+	return this.done || false;
 }
 };
 }(jQuery);
 
+} // if foswiki.HijaxPlugin == undefined
+
 jQuery(function(){
-	foswiki.HijaxPlugin.init(foswiki.HijaxPluginConfigurableInit());
+	if (!foswiki.HijaxPlugin.initialised())
+		foswiki.HijaxPlugin.init(foswiki.HijaxPluginConfigurableInit());
 });

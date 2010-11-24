@@ -96,6 +96,7 @@ This provides a random integer from the base 999999. With elements being increme
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | &nbsp; |
+|  24 Nov 2010: | update to make it compatible with FW 1.1.x and the latest ZonePlugin on 1.0.9 |
 |  17 Aug 2010: | problem with JQueryPlugin compatibility so moved addDefaultsToPage out of init into commonTagsHandler |
 |  06 Aug 2010: | javascript framework added to help using Foswiki over ajax, =hijax.js= |
 |  15 Apr 2010: | quick fix to make it work - was trying to get query params from the response object |
